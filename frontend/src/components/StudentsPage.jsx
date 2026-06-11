@@ -1,231 +1,123 @@
-import React, { useEffect, useState } from 'react';
-import { C } from '../theme.js';
-import { fetchStudent } from '../api.js';
-import { Card, Badge, Spinner, EmptyState, ErrorState, buttonStyle } from './ui.jsx';
-import WpmChart from './WpmChart.jsx';
+import React, { useState } from 'react';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, ReferenceLine,
+} from 'recharts';
+import { C, FONT } from '../theme.js';
+import { Card, TypeBadge, Spinner, ErrorState, EmptyText, monthLabel } from './ui.jsx';
+import { StudentPills, useStudentDetail } from './StudentPills.jsx';
 
+// ---------------- ② 生徒ダッシュボード ----------------
+// レイアウト・コピーは docs/miesan-admin-demo.jsx の StudentView / Stat が正。
+// history=1分スピーチタブの月次集計、提出履歴=同タブの提出実データ
 export default function StudentsPage({ students }) {
-  const [selectedId, setSelectedId] = useState(null);
+  const [sid, setSid] = useState(students[0]?.id);
+  const s = students.find((x) => x.id === sid);
+  const { data, error, retry } = useStudentDetail(sid);
 
-  if (!students.length) {
+  if (!s) {
     return (
-      <EmptyState
-        icon="🧑‍🎓"
-        title="生徒が登録されていません"
-        sub="管理シートの「生徒管理」タブに行を追加してください"
-      />
+      <Card style={{ padding: 32, textAlign: 'center' }}>
+        <p style={{ fontFamily: FONT.display, fontSize: 18, color: C.teal, margin: 0 }}>生徒が登録されていません</p>
+        <p style={{ fontFamily: FONT.body, fontSize: 13, color: C.sub, marginTop: 8 }}>管理シートの「生徒管理」タブに行を追加してください。</p>
+      </Card>
     );
   }
 
-  if (selectedId) {
-    const student = students.find((s) => s.id === selectedId);
-    return (
-      <StudentDetail
-        student={student}
-        onBack={() => setSelectedId(null)}
-      />
-    );
-  }
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {students.map((s) => (
-        <Card key={s.id || s.name} style={{ cursor: 'pointer' }}>
-          <div
-            onClick={() => s.id && setSelectedId(s.id)}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-          >
-            <div>
-              <div style={{ fontWeight: 700, marginBottom: 4 }}>{s.name}</div>
-              <div style={{ fontSize: 12, color: C.sub }}>
-                {s.course} ・ 開始 {s.startMonth}
-              </div>
-            </div>
-            <div style={{ textAlign: 'right', fontSize: 12, color: C.sub }}>
-              <div>目標WPM {s.goalWpm}</div>
-              <div>月間目標 {s.monthlyTargetH}h</div>
-            </div>
-          </div>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function StudentDetail({ student, onBack }) {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-  const [studyView, setStudyView] = useState('cumulative'); // 累積を正とする(設計書6.3)
-
-  const load = () => {
-    setError(null);
-    setData(null);
-    fetchStudent(student.id)
-      .then(setData)
-      .catch((err) => setError(err.message));
-  };
-
-  useEffect(load, [student.id]);
+  const history = (data?.monthly || []).map((m) => ({ d: monthLabel(m.month), wpm: m.avgWpm }));
+  const latest = history[history.length - 1];
+  const first = history[0];
 
   return (
     <div>
-      <button onClick={onBack} style={{ ...buttonStyle('ghost'), marginBottom: 16 }}>
-        ← 生徒一覧へ
-      </button>
+      <StudentPills students={students} sid={sid} setSid={setSid} />
 
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 16 }}>
-        <h2 style={{ margin: 0, fontSize: 20 }}>{student.name}</h2>
-        <Badge>{student.course}</Badge>
-      </div>
-
-      {error && <ErrorState message={error} onRetry={load} />}
-      {!error && !data && <Spinner label={`${student.name}さんのデータを読み込み中…`} />}
+      {error && <ErrorState message={error} onRetry={retry} />}
+      {!error && !data && <Spinner label={`${s.name}さんのデータを読み込み中…`} />}
 
       {data && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <Card>
-            <SectionTitle>🎤 1分スピーチ WPM推移</SectionTitle>
-            {data.speeches.length ? (
-              <WpmChart speeches={data.speeches} goalWpm={student.goalWpm} />
-            ) : (
-              <EmptyText>まだ提出がありません</EmptyText>
-            )}
-            {data.monthly.length > 0 && (
-              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 12, fontSize: 12, color: C.sub }}>
-                {data.monthly.map((m) => (
-                  <span key={m.month}>
-                    {m.month}: 平均 <b style={{ color: C.ink }}>{m.avgWpm}</b> WPM({m.count}件)
-                  </span>
-                ))}
-              </div>
-            )}
-          </Card>
-
-          <Card>
-            <SectionTitle>📚 教材進捗</SectionTitle>
-            {data.materials.length ? (
-              data.materials.map((m) => <MaterialBar key={m.name} material={m} />)
-            ) : (
-              <EmptyText>トラッキングデータがありません</EmptyText>
-            )}
-          </Card>
-
-          <Card>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <SectionTitle style={{ marginBottom: 0 }}>⏱ 勉強時間</SectionTitle>
-              <div style={{ display: 'flex', gap: 6 }}>
-                {[
-                  ['cumulative', '累積'],
-                  ['monthly', '月次'],
-                ].map(([key, label]) => (
-                  <button
-                    key={key}
-                    onClick={() => setStudyView(key)}
-                    style={{
-                      ...buttonStyle('ghost'),
-                      padding: '4px 12px',
-                      fontSize: 12,
-                      background: studyView === key ? C.accentSoft : C.paper,
-                      borderColor: studyView === key ? C.accent : C.line,
-                    }}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+        <>
+          <Card style={{ padding: 20, marginBottom: 14 }}>
+            <div className="flex items-baseline justify-between mb-1">
+              <h2 style={{ fontFamily: FONT.display, fontSize: 22, color: C.ink, margin: 0 }}>{s.name}さん</h2>
+              <span style={{ fontFamily: FONT.body, fontSize: 12, color: C.sub }}>{s.course}コース ・ {monthsSince(s.startMonth)}ヶ月目</span>
             </div>
-            <StudyHours
-              entries={data.study}
-              view={studyView}
-              monthlyTargetH={student.monthlyTargetH}
-            />
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              <Stat label="現在WPM" value={latest ? latest.wpm : '–'} sub={`目標 ${s.goalWpm}`} />
+              <Stat label="開始時から" value={latest && first ? `+${latest.wpm - first.wpm}` : '–'} sub="WPM" accent />
+              {/* 流暢さ/フィラーは生徒シートに未記録のためプレースホルダ表示 */}
+              <Stat label="流暢さ" value="–/10" sub="フィラー –回" />
+            </div>
           </Card>
-        </div>
+
+          <Card style={{ padding: 20, marginBottom: 14 }}>
+            <p style={{ fontFamily: FONT.body, fontSize: 12, letterSpacing: "0.1em", color: C.sub, margin: "0 0 10px" }}>WPM推移</p>
+            {history.length ? (
+              <div style={{ width: "100%", height: 220 }}>
+                <ResponsiveContainer>
+                  <LineChart data={history} margin={{ top: 8, right: 12, left: -16, bottom: 0 }}>
+                    <CartesianGrid stroke={C.line} strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="d" tick={{ fontFamily: FONT.body, fontSize: 12, fill: C.sub }} axisLine={false} tickLine={false} />
+                    <YAxis domain={[40, Math.max(s.goalWpm + 10, latest.wpm + 10)]} tick={{ fontFamily: FONT.body, fontSize: 12, fill: C.sub }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={{ fontFamily: FONT.body, fontSize: 12, borderRadius: 10, border: `1px solid ${C.line}` }} />
+                    <ReferenceLine y={s.goalWpm} stroke={C.amber} strokeDasharray="4 4"
+                      label={{ value: `目標 ${s.goalWpm}`, position: "insideTopRight", fontFamily: FONT.body, fontSize: 11, fill: C.amber }} />
+                    <Line type="monotone" dataKey="wpm" stroke={C.teal} strokeWidth={2.5}
+                      dot={{ r: 4, fill: C.teal }} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <EmptyText>まだ提出がありません。</EmptyText>
+            )}
+          </Card>
+
+          <Card style={{ padding: 20 }}>
+            <p style={{ fontFamily: FONT.body, fontSize: 12, letterSpacing: "0.1em", color: C.sub, margin: "0 0 10px" }}>提出履歴</p>
+            {data.speeches.length ? (
+              <div className="flex flex-col">
+                {[...data.speeches].reverse().slice(0, 10).map((sub, i) => (
+                  <div key={i} className="flex items-center justify-between py-3"
+                    style={{ borderTop: i === 0 ? "none" : `1px solid ${C.line}` }}>
+                    <div className="flex items-center gap-3">
+                      <span style={{ fontFamily: FONT.body, fontSize: 12, color: C.sub, width: 36 }}>{shortDate(sub.date)}</span>
+                      <TypeBadge type="1分スピーチ" />
+                    </div>
+                    <span style={{ fontFamily: FONT.body, fontSize: 12, color: C.sub }}>WPM {sub.wpm}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyText>まだ提出がありません。</EmptyText>
+            )}
+          </Card>
+        </>
       )}
     </div>
   );
 }
 
-function SectionTitle({ children, style }) {
-  return <div style={{ fontWeight: 700, marginBottom: 12, ...style }}>{children}</div>;
-}
-
-function EmptyText({ children }) {
-  return <div style={{ fontSize: 13, color: C.sub }}>{children}</div>;
-}
-
-function MaterialBar({ material }) {
-  const pct = material.total > 0 ? Math.min(100, Math.round((material.done / material.total) * 100)) : 0;
+function Stat({ label, value, sub, accent }) {
   return (
-    <div style={{ marginBottom: 12 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
-        <span>{material.name}</span>
-        <span style={{ color: C.sub }}>
-          {material.done}/{material.total}({pct}%)
-        </span>
-      </div>
-      <div style={{ height: 8, background: C.cream, borderRadius: 999 }}>
-        <div
-          style={{
-            height: '100%',
-            width: `${pct}%`,
-            background: C.green,
-            borderRadius: 999,
-          }}
-        />
-      </div>
+    <div style={{ background: accent ? C.sageLight : C.cream, borderRadius: 12, padding: "12px 10px", textAlign: "center" }}>
+      <p style={{ fontFamily: FONT.body, fontSize: 11, color: C.sub, margin: 0 }}>{label}</p>
+      <p style={{ fontFamily: FONT.display, fontSize: 24, color: accent ? C.teal : C.ink, margin: "2px 0 0", lineHeight: 1.2 }}>{value}</p>
+      <p style={{ fontFamily: FONT.body, fontSize: 11, color: C.sub, margin: 0 }}>{sub}</p>
     </div>
   );
 }
 
-function StudyHours({ entries, view, monthlyTargetH }) {
-  if (!entries.length) {
-    return <EmptyText>勉強時間の記録がありません</EmptyText>;
-  }
+// 開始月('2026-04')から数えて何ヶ月目か
+function monthsSince(startMonth) {
+  const m = /^(\d{4})[-/](\d{1,2})/.exec(startMonth || '');
+  if (!m) return 1;
+  const now = new Date();
+  const diff = (now.getFullYear() - Number(m[1])) * 12 + (now.getMonth() + 1 - Number(m[2])) + 1;
+  return Math.max(diff, 1);
+}
 
-  const byMonth = {};
-  for (const e of entries) {
-    const month = (e.date || '').substring(0, 7).replace('/', '-');
-    byMonth[month] = (byMonth[month] || 0) + e.hours;
-  }
-  const months = Object.keys(byMonth).sort();
-
-  let cumulative = 0;
-  const rows = months.map((m) => {
-    cumulative += byMonth[m];
-    return { month: m, hours: byMonth[m], cumulative };
-  });
-
-  return (
-    <div style={{ marginTop: 12 }}>
-      {rows.map((r) => {
-        const value = view === 'cumulative' ? r.cumulative : r.hours;
-        const target = view === 'cumulative'
-          ? monthlyTargetH * (rows.indexOf(r) + 1)
-          : monthlyTargetH;
-        const pct = target > 0 ? Math.min(100, Math.round((value / target) * 100)) : 0;
-        const behind = value < target;
-        return (
-          <div key={r.month} style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
-              <span>{r.month}</span>
-              <span style={{ color: behind ? C.red : C.green, fontWeight: 700 }}>
-                {value.toFixed(1)}h / {target}h
-              </span>
-            </div>
-            <div style={{ height: 8, background: C.cream, borderRadius: 999 }}>
-              <div
-                style={{
-                  height: '100%',
-                  width: `${pct}%`,
-                  background: behind ? C.accent : C.green,
-                  borderRadius: 999,
-                }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+// '2026/06/12' → '6/12'
+function shortDate(date) {
+  const parts = (date || '').split(/[-/]/);
+  return parts.length === 3 ? `${Number(parts[1])}/${Number(parts[2])}` : date;
 }

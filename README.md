@@ -84,16 +84,22 @@ npm run dev                  # ローカル確認
 
 Vercel: ルートディレクトリ=`frontend`、環境変数 `VITE_GAS_URL` / `VITE_API_KEY` を設定。
 
-## ⚠️ UIについて(未完了事項)
+## UIについて
 
-設計書はUIの正を `miesan-admin-demo.jsx` と定めているが、**本リポジトリ作成時点で未入手**。
-現在の `frontend/src/theme.js` のデザイントークンと各画面レイアウトは仮実装。
-デモJSXを入手したら `docs/` に置き、トークン・レイアウト・コピーをデモに合わせて差し替えること。
+UIの正は `docs/miesan-admin-demo.jsx`。デザイントークン(`frontend/src/theme.js` の C / FONT)・
+レイアウト・コピーはデモから移植済み(Tailwind + recharts + lucide-react)。
+
+デモとの差分(実データに存在しない項目のみ):
+- ヘッダーの「デモ版(モックデータ)」表記を削除、生徒数バッジは実数表示
+- 生徒タブの「流暢さ/フィラー」統計は生徒シートに未記録のため「–」表示(枠は維持)
+- 提出履歴は1分スピーチタブの実データ(他種別の提出は生徒シートに記録されないため)
+- トラッキングの当月目標時間は日割り(月間目標 × 経過日数/月日数)で計算
 
 ## 実装状況
 
 - [x] Phase 1: GAS API(api.gs / FB候補K〜M列拡張 / checkSetup拡張 / 生徒追加メニュー / validateStudentSheets)
 - [x] Phase 2: フロント接続(bootstrap取得・ローディング/エラー/空状態・approve楽観更新・5分キャッシュ)
+- [x] UI照合: miesan-admin-demo.jsx のトークン・レイアウト・コピーへ差し替え
 - [ ] Phase 3: デプロイ(clasp push + Vercel。要: WEBAPP_API_KEY / TEMPLATE_SHEET_ID)
 - [ ] Phase 4: 03英会話 + 05振り返り
 - [ ] Phase 5: 06トラッキング通知 — **「Phase 5 GO」が出るまで着手禁止**

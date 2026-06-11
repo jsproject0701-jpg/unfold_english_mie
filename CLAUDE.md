@@ -2,8 +2,8 @@
 
 ## 必読
 作業開始前に必ず `docs/miesan-webapp-handoff.md` を読むこと。これが設計の正。
-- `miesan-admin-demo.jsx` = UIの正。デザイントークン・レイアウト・コピーを変更しない
-  （※未入手。入手したら `docs/miesan-admin-demo.jsx` に置き、`frontend/src/theme.js` と画面を必ず照合する）
+- `docs/miesan-admin-demo.jsx` = UIの正。デザイントークン・レイアウト・コピーを変更しない
+  （照合済み。`frontend/src/theme.js` と各画面はデモから移植。実データに無い項目の扱いはREADME「UIについて」参照）
 - `gas/みえさんGAS.js` = 本番稼働中のv5.0コード。LINE Botとして生徒9名が利用中
 
 ## 絶対ルール
