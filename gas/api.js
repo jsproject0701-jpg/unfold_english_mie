@@ -6,7 +6,7 @@
 // GET  ?action=student&id=<sheetId>&key=... 生徒詳細(遅延取得)
 // POST ?action=approve                    FB承認 body(text/plain JSON): {uuid, finalText, key}
 //
-// doPost本体はみえさんGAS.js側。?action= 付きPOSTのみ handleApiPost に分岐する。
+// doPost本体はコード.js側。?action= 付きPOSTのみ handleApiPost に分岐する。
 // ============================================================
 
 var TRACKING_SHEET_NAME = 'トラッキング';
@@ -35,7 +35,7 @@ function doGet(e) {
   }
 }
 
-// doPost(みえさんGAS.js)から ?action= 付きPOSTのみ呼ばれる
+// doPost(コード.js)から ?action= 付きPOSTのみ呼ばれる
 function handleApiPost(e) {
   try {
     var body = {};

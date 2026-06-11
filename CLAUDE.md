@@ -4,7 +4,7 @@
 作業開始前に必ず `docs/miesan-webapp-handoff.md` を読むこと。これが設計の正。
 - `docs/miesan-admin-demo.jsx` = UIの正。デザイントークン・レイアウト・コピーを変更しない
   （照合済み。`frontend/src/theme.js` と各画面はデモから移植。実データに無い項目の扱いはREADME「UIについて」参照）
-- `gas/みえさんGAS.js` = 本番稼働中のv5.0コード。LINE Botとして生徒9名が利用中
+- `gas/コード.js` = 本番稼働中のv5.0コード。LINE Botとして生徒9名が利用中
 
 ## 絶対ルール
 1. 本番GASを壊さない。LINE Webhook（doPost）の既存分岐に影響する変更は、
@@ -25,6 +25,6 @@
 - 私が事前に用意するもの: TEMPLATE_SHEET_ID（生徒テンプレシート）、WEBAPP_API_KEY
 
 ## リポジトリ構成
-- `gas/` … GASプロジェクト（claspのrootDir）。`みえさんGAS.js`=LINE Bot本体、`api.js`=Webアプリ用API（GAS上ではapi.gs）
+- `gas/` … GASプロジェクト（claspのrootDir）。`コード.js`=LINE Bot本体(本番のファイル名に一致)、`api.js`=Webアプリ用API（GAS上ではapi.gs）
 - `frontend/` … Vite + React 管理コンソール
 - `docs/` … 設計書（handoff）

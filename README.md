@@ -4,7 +4,7 @@
 
 ```
 gas/        GASプロジェクト(claspのrootDir)
-  みえさんGAS.js   LINE Bot本体(v5.1 = 本番v5.0 + Phase1差分)
+  コード.js   LINE Bot本体(v5.1 = 本番v5.0 + Phase1差分)
   api.js           Web管理画面用API(GAS上では api.gs)
   appsscript.json  マニフェスト ※初回push前に既存プロジェクトの内容と要照合
 frontend/   Vite + React 管理コンソール(Vercelにデプロイ)
@@ -13,7 +13,7 @@ docs/       設計書
 
 ## 本番GAS(v5.0)からの差分 — 要承認ポイント
 
-`gas/みえさんGAS.js` は本番v5.0に対して以下の3点のみ変更している。
+`gas/コード.js` は本番v5.0に対して以下の3点のみ変更している。
 
 1. **doPost冒頭にAPI分岐を追加(LINE Webhookへの影響対策)**
    ```js
