@@ -102,8 +102,8 @@ function getStudentList() {
     if (status !== 'active') continue;
     students.push({
       id: (r[2] || '').toString().trim(),
-      name: (r[1] || '').toString(),
-      course: r[5] ? r[5].toString() : '-',
+      name: (r[1] || '').toString().trim(),
+      course: r[5] ? r[5].toString().trim() : '-',
       startMonth: formatMonthValue(r[6]),
       goalWpm: Number(r[7]) || 90,
       monthlyTargetH: Number(r[8]) || 60,
