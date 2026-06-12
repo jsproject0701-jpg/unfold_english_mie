@@ -1,2 +1,22 @@
 /* デモ(docs/miesan-admin-demo.jsx)はTailwindユーティリティ前提のため導入 */
 @import "tailwindcss";
+
+/* デモの<style>ブロック相当。Tailwind v4ではユーティリティが@layer内にあるため、
+   レイヤー外に書くと px-4 等のボタン余白を上書きしてしまう → baseレイヤーに置く */
+@layer base {
+  button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+  }
+  button:focus-visible {
+    outline: 2px solid #9dbe94; /* C.sage */
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+    }
+  }
+}

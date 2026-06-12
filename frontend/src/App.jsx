@@ -40,12 +40,7 @@ export default function App() {
 
   return (
     <div style={{ minHeight: "100vh", background: C.cream, fontFamily: FONT.body }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
-        button { cursor: pointer; border: none; background: none; padding: 0; }
-        button:focus-visible { outline: 2px solid ${C.sage}; outline-offset: 2px; }
-        @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-      `}</style>
+      {/* ボタンリセット等は index.css(@layer base)、フォント読込は index.html 側 */}
 
       {/* ヘッダー */}
       <header style={{ background: C.teal, padding: "20px 16px 14px" }}>
