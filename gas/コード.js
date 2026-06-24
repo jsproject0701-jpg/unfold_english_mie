@@ -115,6 +115,13 @@ function doPost(e) {
       if (msgType === 'text') {
         var txt = (event.message.text || '').trim();
 
+        // ── #時間 1.5 で勉強時間を記録(Phase 5・tracking.js) ──
+        // "#時間" で始まるテキストだけをここで処理し、それ以外は従来通り下へ流す
+        if (txt.indexOf('#時間') === 0) {
+          handleTimeReport(student, txt, config, event.replyToken);
+          continue;
+        }
+
         // ── リッチメニュー #コマンド → モード切替(常に優先) ──
         var taskKey = RICH_MENU_MAP[txt];
         if (taskKey) {

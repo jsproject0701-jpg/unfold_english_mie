@@ -100,6 +100,17 @@ UIの正は `docs/miesan-admin-demo.jsx`。デザイントークン(`frontend/sr
 - [x] Phase 1: GAS API(api.gs / FB候補K〜M列拡張 / checkSetup拡張 / 生徒追加メニュー / validateStudentSheets)
 - [x] Phase 2: フロント接続(bootstrap取得・ローディング/エラー/空状態・approve楽観更新・5分キャッシュ)
 - [x] UI照合: miesan-admin-demo.jsx のトークン・レイアウト・コピーへ差し替え
-- [ ] Phase 3: デプロイ(clasp push + Vercel。要: WEBAPP_API_KEY / TEMPLATE_SHEET_ID)
+- [x] Phase 3: デプロイ(GAS新バージョン + Vercel本番公開)
 - [ ] Phase 4: 03英会話 + 05振り返り
-- [ ] Phase 5: 06トラッキング通知 — **「Phase 5 GO」が出るまで着手禁止**
+- [x] Phase 5 Step 1: 06トラッキング通知(時間ベース) — `#時間`記録 / 毎日21時ビハインド判定 / 通知ログ ※デプロイ待ち
+- [ ] Phase 5 Step 2: 課題(目標日)ベースのビハインド通知
+
+### Phase 5 Step 1 のデプロイ手順(時間ベース)
+1. `clasp push` → GASエディタで「デプロイを管理」→ **新バージョン**(LINE Webhook URLは不変)
+2. 管理シートに「通知ログ」「勉強時間ログ」タブが無ければ自動作成される(初回記録時)
+3. 生徒管理タブの **I列「月間目標時間(h)」** を各生徒に入力
+4. メニュー「🎓 生徒管理 ＞ ビハインド通知トリガーを設定(毎日21時)」を1回実行
+5. 動作確認: LINEで `#時間 1.5` → 勉強時間ログに行が増える。メニュー「今すぐビハインド判定を実行(テスト)」で対象者に通知
+
+> **doPostへの変更点(ルール1)**: テキスト処理の先頭に「`#時間`で始まる場合のみ記録して終了」する分岐を1つ追加。
+> それ以外のメッセージは従来通り。**ロールバック**は コード.js のこの if ブロック削除＋トリガー削除(`removeDailyBehindTrigger`)。

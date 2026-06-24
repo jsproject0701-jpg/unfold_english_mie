@@ -344,6 +344,9 @@ function onOpen() {
     .createMenu('🎓 生徒管理')
     .addItem('新しい生徒を追加', 'menuAddStudent')
     .addItem('シート規約チェックを実行', 'validateStudentSheets')
+    .addSeparator()
+    .addItem('ビハインド通知トリガーを設定(毎日21時)', 'setupDailyBehindTrigger')
+    .addItem('今すぐビハインド判定を実行(テスト)', 'runDailyBehindCheck')
     .addToUi();
 }
 
