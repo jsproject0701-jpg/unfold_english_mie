@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    font-family: 'IPAGothic', 'WenQuanYi Zen Hei', sans-serif;
+    color: #22302C;
+    font-size: 10.5pt;
+    line-height: 1.7;
+    margin: 0;
+  }
+  h1 { font-size: 20pt; margin: 0 0 2pt 0; }
+  h2 {
+    font-size: 14pt; color: #0E3F3A;
+    border-bottom: 2px solid #9DBE94;
+    padding-bottom: 3pt; margin: 22pt 0 10pt 0;
+  }
+  h3 { font-size: 11.5pt; color: #1B5A52; margin: 14pt 0 4pt 0; }
+  p { margin: 4pt 0; }
+  .lead { font-size: 10.5pt; color: #65756F; }
+  .titlebox {
+    background-color: #0E3F3A; color: #F6F1E4;
+    padding: 18pt 20pt; margin-bottom: 6pt;
+  }
+  .titlebox .sub { color: #9DBE94; font-size: 10pt; letter-spacing: 1pt; margin: 4pt 0 0 0; }
+  table { border-collapse: collapse; width: 100%; margin: 8pt 0; }
+  th, td {
+    border: 1px solid #E5DECB; padding: 6pt 8pt;
+    text-align: left; vertical-align: top; font-size: 9.5pt;
+  }
+  th { background-color: #0E3F3A; color: #F6F1E4; font-weight: bold; }
+  .alt td { background-color: #FCFAF3; }
+  .flow td {
+    background-color: #E7F0E0; border: 1px solid #9DBE94;
+    text-align: center; font-size: 9.5pt; padding: 8pt 4pt;
+  }
+  .flow .arrow { background-color: transparent; border: none; color: #0E3F3A; font-weight: bold; width: 4%; }
+  .num {
+    background-color: #0E3F3A; color: #F6F1E4; font-weight: bold;
+    border-radius: 50%; padding: 1pt 6pt; margin-right: 4pt;
+  }
+  .card { background-color: #FCFAF3; border: 1px solid #E5DECB; padding: 8pt 12pt; margin: 6pt 0; }
+  .amber { background-color: #F7E8D4; border: 1px solid #C2762E; padding: 8pt 12pt; margin: 6pt 0; }
+  .footer { color: #65756F; font-size: 8.5pt; border-top: 1px solid #E5DECB; margin-top: 18pt; padding-top: 6pt; }
+  ul { margin: 4pt 0; padding-left: 18pt; }
+  li { margin: 2pt 0; }
+  .small { font-size: 9pt; color: #65756F; }
+</style>
+</head>
+<body>
+
+<div class="titlebox">
+  <h1>unfold english 管理コンソール</h1>
+  <p class="sub">ご説明資料 ｜ アプリの仕組みと管理シートとのつながり</p>
+</div>
+<p class="lead">この資料は、新しくできた「管理コンソール（Webアプリ）」が何をするものか、そして今お使いの
+Googleスプレッドシートとどうつながっているかを、みえさんにご説明するためのものです。</p>
+
+<h2>1. このアプリでできること（ひとことで）</h2>
+<div class="card">
+<p><b>生徒さんがLINEで送ってきた課題を、AIが自動で分析して「フィードバックの下書き（候補3つ）」まで用意します。
+みえさんは管理コンソールの画面で、その下書きを選んで・整えて・コピーするだけ。</b>
+あとはこれまで通りLINEに貼り付けて送れば完了です。</p>
+</div>
+<p>つまり <b>「FBをゼロから書く」作業が「選んで整える」作業に変わる</b> のがいちばんの目的です。
+生徒さんはこれまで通りLINEを使うだけで、やり方は変わりません。</p>
+
+<h2>2. 全体の流れ</h2>
+<p>課題提出からフィードバック送信までの流れは次の4ステップです。</p>
+<table class="flow">
+<tr>
+  <td><b>① 生徒</b><br>LINEで課題を提出<br><span class="small">音声・画像・テキスト</span></td>
+  <td class="arrow">→</td>
+  <td><b>② AIが自動分析</b><br>文字起こし・採点<br><span class="small">FB候補を3つ作成</span></td>
+  <td class="arrow">→</td>
+  <td><b>③ スプレッドシート</b><br>「FB候補」タブに<br>自動で記録</td>
+  <td class="arrow">→</td>
+  <td><b>④ みえさん</b><br>管理コンソールで<br>確認・編集・送信</td>
+</tr>
+</table>
+<p class="small">※ ②〜③はすべて自動です。みえさんの作業は④だけです。</p>
+
+<h3>生徒さんが送れる課題の種類（現在）</h3>
+<table>
+<tr><th>種類</th><th>生徒が送るもの</th><th>AIがすること</th></tr>
+<tr><td>🎤 1分スピーチ</td><td>音声</td><td>文字起こし・WPM（話す速さ）・フィラー・流暢さを採点</td></tr>
+<tr class="alt"><td>🎧 シャドーイング</td><td>音声</td><td>文字起こし・発音・流暢さを採点</td></tr>
+<tr><td>📖 速読</td><td>画像＋テキスト</td><td>チャンキング（区切り）・要約の正確さを採点</td></tr>
+<tr class="alt"><td>✍️ ライティング</td><td>テキスト</td><td>直近の1分スピーチと比較し、使えていない表現を抽出</td></tr>
+</table>
+<p class="small">※「💬 英会話」と「📝 振り返りシート」は現在準備中です（後述のフェーズ4で追加予定）。</p>
+
+<h2>3. 管理コンソールの3つの画面</h2>
+
+<h3>① FB承認（メイン画面・毎日使う場所）</h3>
+<div class="card">
+<p>生徒さんから届いた提出が「FB待ち」として並びます。1件を開くと…</p>
+<ul>
+  <li>AIの解析メモ（文字起こし・採点。生徒には見せない参考情報）が見られます</li>
+  <li><b>FB候補が3つ</b>表示されます。タップして1つ選びます</li>
+  <li>選んだ文面は<b>その場で自由に編集</b>できます（みえさんの言葉に直せます）</li>
+  <li>「コピーしてLINEへ」でコピー → LINEに貼って送信</li>
+  <li>送り終えたら「送信済みにする」を押すと、リストから消えます</li>
+</ul>
+</div>
+
+<h3>② 生徒（一人ひとりの成長を見る画面）</h3>
+<div class="card">
+<p>生徒を選ぶと、その子の <b>WPM（話す速さ）の推移グラフ</b> と目標ライン、これまでの <b>提出履歴</b> が見られます。
+面談前の振り返りや、成長を生徒に見せるときに使えます。</p>
+</div>
+
+<h3>③ トラッキング（勉強量・教材の進み具合）</h3>
+<div class="card">
+<p><b>勉強時間の達成率</b>（月ごと／累積の切替）、<b>教材の進捗バー</b>が見られます。
+達成率が目標に届いていない生徒には「ビハインド検知」のお知らせが画面に出ます。</p>
+<p class="small">※ 自動リマインドをLINEで送る機能は、トーンをみえさんと相談してから（フェーズ5で）追加します。今は画面表示のみです。</p>
+</div>
+
+<div style="page-break-before: always;"></div>
+
+<h2>4. 管理シート（スプレッドシート）と画面のつながり</h2>
+<p>管理コンソールは、新しいデータベースを別に持っているわけではありません。
+<b>今お使いのスプレッドシートを「そのまま見やすく表示している」だけ</b>です。
+どのタブがどの画面になるかは下の表の通りです。</p>
+
+<table>
+<tr><th>スプレッドシートのタブ</th><th>表示される画面</th><th>役割</th></tr>
+<tr>
+  <td><b>生徒管理</b>タブ<br><span class="small">（管理シート）</span></td>
+  <td>生徒一覧・各画面の生徒切替</td>
+  <td>すべての生徒の名簿。名前・コース・目標WPM・月間目標時間などを設定。<b>ここが全ての出発点</b></td>
+</tr>
+<tr class="alt">
+  <td><b>FB候補</b>タブ<br><span class="small">（管理シート）</span></td>
+  <td>① FB承認画面</td>
+  <td>AIが作ったFB候補が記録される。承認すると「送信済み」が書き込まれる</td>
+</tr>
+<tr>
+  <td><b>1分スピーチ</b>タブ<br><span class="small">（各生徒のシート）</span></td>
+  <td>② 生徒画面のWPMグラフ</td>
+  <td>提出ごとの日付とWPMが記録される。これがグラフの元データ</td>
+</tr>
+<tr class="alt">
+  <td><b>トラッキング</b>タブ<br><span class="small">（各生徒のシート）</span></td>
+  <td>③ トラッキング画面の教材進捗</td>
+  <td>教材名・完了範囲・総範囲を記録。進捗バーになる</td>
+</tr>
+<tr>
+  <td><b>勉強時間ログ</b>タブ<br><span class="small">（管理シート）</span></td>
+  <td>③ トラッキング画面の達成率</td>
+  <td>日付・生徒名・勉強時間を記録。達成率グラフになる</td>
+</tr>
+</table>
+
+<div class="amber">
+<p><b>大事なポイント：</b> 生徒の追加・変更・設定はすべて<b>スプレッドシートを編集するだけ</b>で、
+アプリに自動で反映されます（アプリ側をいじる必要はありません）。
+スプレッドシートが「正」で、アプリはそれを映す鏡、という関係です。</p>
+</div>
+
+<h2>5. 生徒さんを追加するには</h2>
+<p>スプレッドシートのメニューから1回操作するだけで完結します。</p>
+<ul>
+  <li>管理シート上部のメニュー「<b>🎓 生徒管理 ＞ 新しい生徒を追加</b>」をクリック</li>
+  <li>生徒の<b>名前</b>と<b>LINE ID</b>（生徒がLINEで「#登録」と送ると本人に表示されるID）を入力</li>
+  <li>→ 生徒用シートが自動で作られ、名簿にも追加され、アプリにもすぐ反映されます</li>
+</ul>
+<p class="small">※ 週に1回、生徒シートの構成が崩れていないか自動チェックし、問題があればみえさんにLINEでお知らせします。</p>
+
+<h2>6. みえさんの毎日の使い方</h2>
+<table>
+<tr><th>ステップ</th><th>やること</th></tr>
+<tr><td><span class="num">1</span></td><td>管理コンソールを開く（スマホ・PCどちらでも）</td></tr>
+<tr class="alt"><td><span class="num">2</span></td><td>「FB承認」に並んだ提出を1件ずつ開く</td></tr>
+<tr><td><span class="num">3</span></td><td>FB候補3つから1つ選び、必要なら言葉を整える</td></tr>
+<tr class="alt"><td><span class="num">4</span></td><td>「コピーしてLINEへ」→ LINEに貼って送信</td></tr>
+<tr><td><span class="num">5</span></td><td>「送信済みにする」を押して完了</td></tr>
+</table>
+
+<h2>7. 今できること / これからの予定</h2>
+<table>
+<tr><th>段階</th><th>内容</th><th>状態</th></tr>
+<tr><td>フェーズ1〜3</td><td>FB承認・生徒・トラッキングの3画面、生徒追加メニュー、本番公開</td><td><b>完了（今ここ）</b></td></tr>
+<tr class="alt"><td>フェーズ4</td><td>「英会話」レビューと「振り返りシート」の自動FB</td><td>予定</td></tr>
+<tr><td>フェーズ5</td><td>勉強の遅れを毎日LINEで自動リマインド（補填プラン付き）</td><td>トーン相談後に着手</td></tr>
+</table>
+
+<h2>8. ご利用上の注意</h2>
+<ul>
+  <li><b>アプリのURLは、みえさんだけにご共有ください。</b> URLを知っている人は生徒データを見られる仕組みのため、SNS等には載せないようお願いします。</li>
+  <li>生徒さんのLINEの使い方はこれまで通りで、変更ありません。</li>
+</ul>
+
+<div class="footer">
+unfold english 管理コンソール ご説明資料 ／ 生徒からのLINE提出 → AI自動分析 → スプレッドシート → 管理コンソールで承認、という流れで動いています。
+</div>
+
+</body>
+</html>
