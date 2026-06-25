@@ -347,6 +347,9 @@ function onOpen() {
     .addSeparator()
     .addItem('ビハインド通知トリガーを設定(毎日21時)', 'setupDailyBehindTrigger')
     .addItem('今すぐビハインド判定を実行(テスト)', 'runDailyBehindCheck')
+    .addSeparator()
+    .addItem('振り返りリマインダーを設定(毎月25日)', 'setupReflectionReminderTrigger')
+    .addItem('今月の振り返りリマインドを送信(テスト)', 'sendReflectionReminders')
     .addToUi();
 }
 

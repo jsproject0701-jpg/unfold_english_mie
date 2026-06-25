@@ -26,8 +26,9 @@ var TASK_TYPES = {
   'one_min':   { label: '1分スピーチ',   accept: ['audio'],          guide: '🎤 1分スピーチですね!\n音声を送ってください。' },
   'shadowing': { label: 'シャドーイング', accept: ['audio'],          guide: '🎧 シャドーイングですね!\n音声を送ってください。' },
   'sokudoku':  { label: '速読',          accept: ['image', 'text'],  guide: '📖 速読ですね!\n画像とテキストを送ってください。' },
-  'eikaiwa':   { label: '英会話',        accept: [],                 guide: '💬 英会話の機能は準備中です!\nもう少しお待ちください。' },
-  'writing':   { label: 'ライティング',   accept: ['text'],           guide: '✍️ ライティングですね!\nライティングのテキストを送ってください。\n(直近の1分スピーチと自動で比較します)' }
+  'eikaiwa':   { label: '英会話',        accept: ['audio'],          guide: '💬 英会話ですね!\n会話の録音を送ってください。\n(10分以内のクリップ推奨。長い場合は分けて送ってください)' },
+  'writing':   { label: 'ライティング',   accept: ['text'],           guide: '✍️ ライティングですね!\nライティングのテキストを送ってください。\n(直近の1分スピーチと自動で比較します)' },
+  'reflection':{ label: '振り返り',      accept: ['text'],           guide: '📝 今月の振り返りです！以下の6項目に答えて、1通のメッセージで送ってください😊\n（全部そろっていなくても大丈夫です）\n\n1️⃣ マインド（今の気持ち・モチベーション）\n2️⃣ 学習習慣（続けられたこと・崩れたこと）\n3️⃣ 最大の変化（この1ヶ月で変わったこと）\n4️⃣ 来月の意識（来月がんばりたいこと）\n5️⃣ 不安・サポート（不安なこと・してほしいこと）\n6️⃣ 英語面の変化（できるようになったこと）' }
 };
 
 // リッチメニューのテキスト → 内部キー
@@ -37,12 +38,13 @@ var RICH_MENU_MAP = {
   '#速読':          'sokudoku',
   '#英会話':        'eikaiwa',
   '#ライティング':  'writing',
+  '#振り返り':      'reflection',
   '#進捗確認':      'progress',
   '#登録':          'register'
 };
 
 // AI自動処理対象
-var AUTO_PROCESS_TYPES = ['one_min', 'shadowing', 'writing', 'sokudoku'];
+var AUTO_PROCESS_TYPES = ['one_min', 'shadowing', 'writing', 'sokudoku', 'eikaiwa'];
 
 // シート名
 var ONE_MIN_SHEET_NAME = '1分スピーチ';
@@ -155,6 +157,12 @@ function doPost(e) {
               replyToUser(config.LINE_TOKEN, event.replyToken,
                 '✍️ ライティングを受け取りました!\n1分スピーチと比較分析中です。FBまでお待ちください :)');
               processWriting(student, txt);
+            } else if (activeMode === 'reflection') {
+              // 振り返り → 即処理(テキスト1通で完結。Phase 4・phase4.js)
+              clearActiveMode(userId);
+              replyToUser(config.LINE_TOKEN, event.replyToken,
+                '📝 振り返りを受け取りました!\nFB候補を作成中です。お待ちください :)');
+              processReflection(student, txt);
             } else {
               // 速読等 → キャッシュして待機
               cachePendingText(userId, txt);
@@ -198,13 +206,18 @@ function doPost(e) {
           clearActiveMode(userId);
 
           if (AUTO_PROCESS_TYPES.indexOf(activeMode) !== -1) {
-            replyToUser(config.LINE_TOKEN, event.replyToken,
-              modeConf.label + 'の音声を受け取りました!\nFBまでお待ちください :)');
+            if (activeMode === 'eikaiwa') {
+              // 英会話はサイズ確認のため返信もprocessEikaiwa側で行う(Phase 4・phase4.js)
+              processEikaiwa(student, event.message.id, config, event.replyToken);
+            } else {
+              replyToUser(config.LINE_TOKEN, event.replyToken,
+                modeConf.label + 'の音声を受け取りました!\nFBまでお待ちください :)');
 
-            if (activeMode === 'one_min') {
-              processOneMinSpeech(student, event.message.id);
-            } else if (activeMode === 'shadowing') {
-              processShadowing(student, event.message.id);
+              if (activeMode === 'one_min') {
+                processOneMinSpeech(student, event.message.id);
+              } else if (activeMode === 'shadowing') {
+                processShadowing(student, event.message.id);
+              }
             }
           } else {
             replyToUser(config.LINE_TOKEN, event.replyToken,
@@ -978,6 +991,14 @@ function writeFeedbackToAdminSheet(student, taskType, analysis) {
        score1 = 'チャンキング: ' + (analysis.chunking_score || '-') + '/10';
        score2 = '要約: ' + (analysis.summary_score || '-') + '/10';
        note = '修正箇所: ' + (analysis.correction_count || 0) + ' | 生徒: ' + (analysis.student_chunking || '').substring(0, 100);
+     } else if (taskType === '英会話') {
+       score1 = '抽出フレーズ: ' + (analysis.phrase_count || 0) + '個';
+       score2 = '';
+       note = analysis.phrases || '';
+     } else if (taskType === '振り返り') {
+       score1 = '月次振り返り';
+       score2 = '';
+       note = '';
      } else {
        score1 = '-'; score2 = '-'; note = '';
      }

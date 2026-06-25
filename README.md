@@ -101,9 +101,21 @@ UIの正は `docs/miesan-admin-demo.jsx`。デザイントークン(`frontend/sr
 - [x] Phase 2: フロント接続(bootstrap取得・ローディング/エラー/空状態・approve楽観更新・5分キャッシュ)
 - [x] UI照合: miesan-admin-demo.jsx のトークン・レイアウト・コピーへ差し替え
 - [x] Phase 3: デプロイ(GAS新バージョン + Vercel本番公開)
-- [ ] Phase 4: 03英会話 + 05振り返り
+- [x] Phase 4: 03英会話 + 05振り返り(phase4.js) — `#英会話`音声FB / `#振り返り`6項目FB / 毎月25日リマインド ※デプロイ待ち
 - [x] Phase 5 Step 1: 06トラッキング通知(時間ベース) — `#時間`記録 / 毎日21時ビハインド判定 / 通知ログ ※デプロイ待ち
 - [ ] Phase 5 Step 2: 課題(目標日)ベースのビハインド通知
+
+### Phase 4 のデプロイ手順
+1. `clasp push` → GASエディタで「デプロイを管理」→ **新バージョン**(LINE Webhook URLは不変)
+2. 動作確認(英会話): LINEで `#英会話` → 録音送信 → FB候補に種別「英会話」で載る(言えなかった表現リスト付き)
+3. 動作確認(振り返り): LINEで `#振り返り` → 6項目テンプレ返信 → 記入して返信 → FB候補に種別「振り返り」で3案
+4. メニュー「🎓 生徒管理 ＞ 振り返りリマインダーを設定(毎月25日)」を1回実行(任意)
+
+> **doPostへの変更点(ルール1)**: ①`TASK_TYPES.eikaiwa` を音声受付に変更＋`AUTO_PROCESS_TYPES`に`eikaiwa`追加 ②`#振り返り`モード追加
+> ③音声分岐で`eikaiwa`を分けて処理(既存one_min/shadowingの挙動は不変) ④テキスト分岐に`reflection`追加(既存writingの挙動は不変)。
+> **ロールバック**: 上記を戻す＋`removeReflectionReminderTrigger`。`#英会話`を準備中に戻すなら `eikaiwa` の accept を `[]`・guide を準備中文言に戻す。
+
+> ★**振り返りのトーン精度**: `phase4.js` の `REFLECTION_FEWSHOT` は空。概要mdの「生徒例→みえさんFB例」を貼るとみえさんトーンの再現度が上がる(空でも動作する)。
 
 ### Phase 5 Step 1 のデプロイ手順(時間ベース)
 1. `clasp push` → GASエディタで「デプロイを管理」→ **新バージョン**(LINE Webhook URLは不変)
